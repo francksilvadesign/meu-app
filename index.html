@@ -1,0 +1,1244 @@
+
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gestor de Pagamentos</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        success: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        warning: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        },
+                        danger: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            200: '#fecaca',
+                            300: '#fca5a5',
+                            400: '#f87171',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;💰&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .btn {
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .tab-button {
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -1px;
+        }
+        
+        .tab-button.active {
+            color: #0ea5e9;
+            border-color: #0ea5e9;
+        }
+        
+        .tab-button:hover:not(.active) {
+            color: #0284c7;
+        }
+        
+        .badge {
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        .highlight {
+            background-color: #fef9c3;
+            transition: background-color 0.5s ease;
+        }
+        
+        .modal-content {
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .input-field {
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .input-field:focus {
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+        
+        .table-row:hover {
+            background-color: #f8fafc;
+        }
+        
+        .status-badge {
+            border-radius: 12px;
+            padding: 0.25rem 0.75rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+<header class="mb-8">
+<div class="flex items-center justify-between">
+<div>
+<h1 class="text-4xl font-bold text-gray-800 flex items-center">
+<span class="mr-3">💰</span> Gestor Financeiro
+                    </h1>
+<p class="text-gray-600 mt-2">Controle seus recebimentos de forma inteligente</p>
+</div>
+<div class="flex space-x-4"><div class="bg-white p-4 rounded-xl shadow-sm flex items-center">
+<div class="bg-primary-100 p-3 rounded-full mr-3">
+<i class="fas fa-users text-primary-600 text-xl"></i>
+</div>
+<div>
+<p class="text-sm text-gray-500">Total de Clientes</p>
+<p class="font-bold text-xl text-primary-600" id="total-clients">0</p>
+</div>
+</div>
+<div class="bg-white p-4 rounded-xl shadow-sm flex items-center">
+<div class="bg-primary-100 p-3 rounded-full mr-3">
+<i class="fas fa-wallet text-primary-600 text-xl"></i>
+</div>
+<div>
+<p class="text-sm text-gray-500">Total Recebido</p>
+<p class="font-bold text-xl text-primary-600" id="total-received">R$ 0,00</p>
+</div>
+</div>
+<div class="bg-white p-4 rounded-xl shadow-sm flex items-center">
+<div class="bg-danger-100 p-3 rounded-full mr-3">
+<i class="fas fa-exclamation-triangle text-danger-600 text-xl"></i>
+</div>
+<div>
+<p class="text-sm text-gray-500">Atrasados</p>
+<p class="font-bold text-xl text-danger-600" id="overdue-count">0</p>
+</div>
+</div>
+</div>
+</div>
+</header>
+<div class="card overflow-hidden mb-8">
+<div class="flex border-b border-gray-100 px-6">
+<button class="tab-button active px-6 py-4 font-medium text-gray-500 hover:text-primary-600 flex items-center" id="total-tab">
+<i class="fas fa-check-circle mr-2"></i> Recebidos
+                </button>
+<button class="tab-button px-6 py-4 font-medium text-gray-500 hover:text-primary-600 flex items-center" id="pending-tab">
+<i class="fas fa-clock mr-2"></i> Pendentes
+                </button>
+<button class="tab-button px-6 py-4 font-medium text-gray-500 hover:text-primary-600 flex items-center" id="overdue-tab">
+<i class="fas fa-exclamation-triangle mr-2"></i> Atrasados
+                </button>
+<button class="tab-button px-6 py-4 font-medium text-gray-500 hover:text-primary-600 flex items-center" id="clients-tab">
+<i class="fas fa-users mr-2"></i> Clientes
+                </button>
+</div>
+<div class="p-6">
+<!-- Total Recebido Section -->
+<div class="tab-content" id="total-content">
+<div class="flex justify-between items-center mb-6">
+<div>
+<h2 class="text-2xl font-semibold text-gray-800">Pagamentos Recebidos</h2>
+<p class="text-gray-500">Todos os pagamentos já realizados pelos clientes</p>
+</div>
+<div class="bg-success-50 border border-success-100 text-success-700 px-4 py-2 rounded-xl flex items-center">
+<i class="fas fa-check-circle mr-2"></i>
+<span class="font-bold text-xl" id="total-received-2">R$ 0,00</span>
+</div>
+</div>
+<div class="overflow-x-auto rounded-xl border border-gray-100">
+<table class="min-w-full divide-y divide-gray-200">
+<thead class="bg-gray-50">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-xl">Cliente</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-xl">Status</th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-100" id="paid-list">
+<!-- Paid items will be added here dynamically -->
+<tr>
+<td class="px-6 py-4 text-center text-gray-500 rounded-b-xl" colspan="4">
+                                        Nenhum pagamento recebido ainda.
+                                    </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Pendentes Section -->
+<div class="tab-content hidden" id="pending-content">
+<div class="flex justify-between items-center mb-6">
+<div>
+<h2 class="text-2xl font-semibold text-gray-800">Pagamentos Pendentes</h2>
+<p class="text-gray-500">Pagamentos que estão aguardando confirmação</p>
+</div>
+<button class="btn btn-primary text-white px-5 py-2.5 rounded-xl flex items-center" id="add-payment-btn">
+<i class="fas fa-plus mr-2"></i> Novo Pagamento
+                        </button>
+</div>
+<div class="overflow-x-auto rounded-xl border border-gray-100">
+<table class="min-w-full divide-y divide-gray-200">
+<thead class="bg-gray-50">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-xl">Cliente</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vencimento</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-xl">Ações</th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-100" id="pending-list">
+<!-- Pending items will be added here dynamically -->
+<tr>
+<td class="px-6 py-4 text-center text-gray-500 rounded-b-xl" colspan="4">
+                                        Nenhum pagamento pendente. Clique em "Novo Pagamento" para adicionar.
+                                    </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Atrasados Section -->
+<div class="tab-content hidden" id="overdue-content">
+<div class="flex justify-between items-center mb-6">
+<div>
+<h2 class="text-2xl font-semibold text-gray-800">Pagamentos Atrasados</h2>
+<p class="text-gray-500">Pagamentos que já passaram da data de vencimento</p>
+</div>
+<div class="bg-danger-50 border border-danger-100 text-danger-700 px-4 py-2 rounded-xl flex items-center">
+<i class="fas fa-exclamation-triangle mr-2"></i>
+<span class="font-bold" id="overdue-count-2">0</span> pagamentos atrasados
+                        </div>
+</div>
+<div class="overflow-x-auto rounded-xl border border-gray-100">
+<table class="min-w-full divide-y divide-gray-200">
+<thead class="bg-gray-50">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-xl">Cliente</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vencimento</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dias Atraso</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-xl">Ações</th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-100" id="overdue-list">
+<!-- Overdue items will be added here dynamically -->
+<tr>
+<td class="px-6 py-4 text-center text-gray-500 rounded-b-xl" colspan="5">
+                                        Nenhum pagamento atrasado.
+                                    </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Clientes Section -->
+<div class="tab-content hidden" id="clients-content">
+<div class="flex justify-between items-center mb-6">
+<div>
+<h2 class="text-2xl font-semibold text-gray-800">Clientes</h2>
+<p class="text-gray-500">Todos os clientes cadastrados no sistema</p>
+</div>
+<button class="btn btn-primary text-white px-5 py-2.5 rounded-xl flex items-center" id="add-client-btn">
+<i class="fas fa-plus mr-2"></i> Novo Cliente
+                        </button>
+</div>
+<div class="overflow-x-auto rounded-xl border border-gray-100">
+<table class="min-w-full divide-y divide-gray-200">
+<thead class="bg-gray-50">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-xl">Nome</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pagamentos Pendentes</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Pago</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-xl">Ações</th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-100" id="clients-list">
+<!-- Clients will be added here dynamically -->
+<tr>
+<td class="px-6 py-4 text-center text-gray-500 rounded-b-xl" colspan="4">
+                                        Nenhum cliente cadastrado. Clique em "Novo Cliente" para adicionar.
+                                    </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Add Payment Modal -->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="payment-modal">
+<div class="modal-content bg-white w-full max-w-md slide-in">
+<div class="p-6">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xl font-semibold text-gray-800 flex items-center">
+<i class="fas fa-money-bill-wave mr-2 text-primary-500"></i> Novo Pagamento
+                    </h3>
+<button class="text-gray-500 hover:text-gray-700 rounded-full p-1 hover:bg-gray-100" id="close-payment-modal">
+<i class="fas fa-times"></i>
+</button>
+</div>
+<form class="space-y-4" id="payment-form">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1" for="client-select">Cliente</label>
+<select class="input-field w-full px-4 py-2.5" id="client-select">
+<!-- Clients will be added here dynamically -->
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1" for="payment-amount">Valor (R$)</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+<input class="input-field w-full pl-10 pr-4 py-2.5" id="payment-amount" required="" step="0.01" type="number"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1" for="payment-date">Data de Vencimento</label>
+<input class="input-field w-full px-4 py-2.5" id="payment-date" required="" type="date"/>
+</div>
+<div class="flex justify-end space-x-3 pt-4">
+<button class="btn border border-gray-300 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-50" id="cancel-payment" type="button">
+                            Cancelar
+                        </button>
+<button class="btn btn-primary text-white px-4 py-2 rounded-xl" type="submit">
+                            Salvar Pagamento
+                        </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- Add Client Modal -->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="client-modal">
+<div class="modal-content bg-white w-full max-w-md slide-in">
+<div class="p-6">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xl font-semibold text-gray-800 flex items-center">
+<i class="fas fa-user-plus mr-2 text-primary-500"></i> Novo Cliente
+                    </h3>
+<button class="text-gray-500 hover:text-gray-700 rounded-full p-1 hover:bg-gray-100" id="close-client-modal">
+<i class="fas fa-times"></i>
+</button>
+</div>
+<form class="space-y-4" id="client-form">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1" for="client-name">Nome do Cliente</label>
+<input class="input-field w-full px-4 py-2.5" id="client-name" required="" type="text"/>
+</div>
+<div class="flex justify-end space-x-3 pt-4">
+<button class="btn border border-gray-300 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-50" id="cancel-client" type="button">
+                            Cancelar
+                        </button>
+<button class="btn btn-primary text-white px-4 py-2 rounded-xl" type="submit">
+                            Cadastrar Cliente
+                        </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- Edit Client Modal -->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="edit-client-modal">
+<div class="modal-content bg-white w-full max-w-md slide-in">
+<div class="p-6">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xl font-semibold text-gray-800 flex items-center">
+<i class="fas fa-user-edit mr-2 text-primary-500"></i> Editar Cliente
+                    </h3>
+<button class="text-gray-500 hover:text-gray-700 rounded-full p-1 hover:bg-gray-100" id="close-edit-client-modal">
+<i class="fas fa-times"></i>
+</button>
+</div>
+<form class="space-y-4" id="edit-client-form">
+<input id="edit-client-id" type="hidden"/>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1" for="edit-client-name">Nome do Cliente</label>
+<input class="input-field w-full px-4 py-2.5" id="edit-client-name" required="" type="text"/>
+</div>
+<div class="flex justify-end space-x-3 pt-4">
+<button class="btn border border-gray-300 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-50" id="cancel-edit-client" type="button">
+                            Cancelar
+                        </button>
+<button class="btn btn-primary text-white px-4 py-2 rounded-xl" type="submit">
+                            Atualizar Cliente
+                        </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- Edit Payment Modal -->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="edit-payment-modal">
+<div class="modal-content bg-white w-full max-w-md slide-in">
+<div class="p-6">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xl font-semibold text-gray-800 flex items-center">
+<i class="fas fa-edit mr-2 text-primary-500"></i> Editar Pagamento
+                    </h3>
+<button class="text-gray-500 hover:text-gray-700 rounded-full p-1 hover:bg-gray-100" id="close-edit-payment-modal">
+<i class="fas fa-times"></i>
+</button>
+</div>
+<form class="space-y-4" id="edit-payment-form">
+<input id="edit-payment-id" type="hidden"/>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1" for="edit-client-select">Cliente</label>
+<select class="input-field w-full px-4 py-2.5" id="edit-client-select">
+<!-- Clients will be added here dynamically -->
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1" for="edit-payment-amount">Valor (R$)</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+<input class="input-field w-full pl-10 pr-4 py-2.5" id="edit-payment-amount" required="" step="0.01" type="number"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1" for="edit-payment-date">Data de Vencimento</label>
+<input class="input-field w-full px-4 py-2.5" id="edit-payment-date" required="" type="date"/>
+</div>
+<div class="flex justify-end space-x-3 pt-4">
+<button class="btn border border-gray-300 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-50" id="cancel-edit-payment" type="button">
+                            Cancelar
+                        </button>
+<button class="btn btn-primary text-white px-4 py-2 rounded-xl" type="submit">
+                            Atualizar Pagamento
+                        </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- Confirmation Modal -->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="confirm-modal">
+<div class="modal-content bg-white w-full max-w-md slide-in">
+<div class="p-6">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xl font-semibold text-gray-800 flex items-center" id="confirm-title">
+<i class="fas fa-exclamation-circle mr-2 text-danger-500"></i> Confirmar Exclusão
+                    </h3>
+<button class="text-gray-500 hover:text-gray-700 rounded-full p-1 hover:bg-gray-100" id="close-confirm-modal">
+<i class="fas fa-times"></i>
+</button>
+</div>
+<p class="text-gray-700 mb-6" id="confirm-message">Tem certeza que deseja excluir este item?</p>
+<div class="flex justify-end space-x-3">
+<button class="btn border border-gray-300 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-50" id="cancel-confirm" type="button">
+                        Cancelar
+                    </button>
+<button class="btn btn-danger text-white px-4 py-2 rounded-xl" id="confirm-action" type="button">
+                        Confirmar
+                    </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+        // Data storage
+        let clients = JSON.parse(localStorage.getItem('clients')) || [];
+        let payments = JSON.parse(localStorage.getItem('payments')) || [];
+        
+        // DOM Elements
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // Modal elements
+        const paymentModal = document.getElementById('payment-modal');
+        const clientModal = document.getElementById('client-modal');
+        const editClientModal = document.getElementById('edit-client-modal');
+        const editPaymentModal = document.getElementById('edit-payment-modal');
+        const confirmModal = document.getElementById('confirm-modal');
+        
+        // Form elements
+        const clientForm = document.getElementById('client-form');
+        const paymentForm = document.getElementById('payment-form');
+        const editClientForm = document.getElementById('edit-client-form');
+        const editPaymentForm = document.getElementById('edit-payment-form');
+        
+        // Buttons
+        const addClientBtn = document.getElementById('add-client-btn');
+        const addPaymentBtn = document.getElementById('add-payment-btn');
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI();
+            setupEventListeners();
+            
+            // Set default date to today
+            document.getElementById('payment-date').valueAsDate = new Date();
+        });
+        
+        function setupEventListeners() {
+            // Tab switching
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active', 'text-primary-600', 'border-primary-600'));
+                    button.classList.add('active', 'text-primary-600', 'border-primary-600');
+                    
+                    const target = button.id.replace('-tab', '-content');
+                    tabContents.forEach(content => content.classList.add('hidden'));
+                    document.getElementById(target).classList.remove('hidden');
+                });
+            });
+            
+            // Add client button
+            addClientBtn.addEventListener('click', () => {
+                clientModal.classList.remove('hidden');
+                document.getElementById('client-name').focus();
+            });
+            
+            // Add payment button
+            addPaymentBtn.addEventListener('click', () => {
+                populateClientSelect();
+                paymentModal.classList.remove('hidden');
+            });
+            
+            // Close modals
+            document.getElementById('close-payment-modal').addEventListener('click', () => paymentModal.classList.add('hidden'));
+            document.getElementById('close-client-modal').addEventListener('click', () => clientModal.classList.add('hidden'));
+            document.getElementById('close-edit-client-modal').addEventListener('click', () => editClientModal.classList.add('hidden'));
+            document.getElementById('close-edit-payment-modal').addEventListener('click', () => editPaymentModal.classList.add('hidden'));
+            document.getElementById('close-confirm-modal').addEventListener('click', () => confirmModal.classList.add('hidden'));
+            
+            // Cancel buttons
+            document.getElementById('cancel-client').addEventListener('click', () => clientModal.classList.add('hidden'));
+            document.getElementById('cancel-payment').addEventListener('click', () => paymentModal.classList.add('hidden'));
+            document.getElementById('cancel-edit-client').addEventListener('click', () => editClientModal.classList.add('hidden'));
+            document.getElementById('cancel-edit-payment').addEventListener('click', () => editPaymentModal.classList.add('hidden'));
+            document.getElementById('cancel-confirm').addEventListener('click', () => confirmModal.classList.add('hidden'));
+            
+            // Form submissions
+            clientForm.addEventListener('submit', handleAddClient);
+            paymentForm.addEventListener('submit', handleAddPayment);
+            editClientForm.addEventListener('submit', handleEditClient);
+            editPaymentForm.addEventListener('submit', handleEditPayment);
+        }
+        
+        function handleAddClient(e) {
+            e.preventDefault();
+            const name = document.getElementById('client-name').value.trim();
+            
+            if (name) {
+                const newClient = {
+                    id: Date.now().toString(),
+                    name: name
+                };
+                
+                clients.push(newClient);
+                saveData();
+                clientModal.classList.add('hidden');
+                clientForm.reset();
+                updateUI();
+                
+                // Show success animation
+                const button = e.target.querySelector('button[type="submit"]');
+                button.innerHTML = '<i class="fas fa-check mr-2"></i> Cadastrado!';
+                button.classList.add('bg-success-500', 'hover:bg-success-600');
+                
+                setTimeout(() => {
+                    button.innerHTML = 'Cadastrar Cliente';
+                    button.classList.remove('bg-success-500', 'hover:bg-success-600');
+                    button.classList.add('bg-primary-500', 'hover:bg-primary-600');
+                }, 1500);
+            }
+        }
+        
+        function handleAddPayment(e) {
+            e.preventDefault();
+            const clientId = document.getElementById('client-select').value;
+            const amount = parseFloat(document.getElementById('payment-amount').value);
+            const date = document.getElementById('payment-date').value;
+            
+            if (clientId && amount && date) {
+                const client = clients.find(c => c.id === clientId);
+                
+                const newPayment = {
+                    id: Date.now().toString(),
+                    clientId: clientId,
+                    clientName: client.name,
+                    amount: amount,
+                    dueDate: date,
+                    status: 'pending',
+                    paidDate: null
+                };
+                
+                payments.push(newPayment);
+                saveData();
+                paymentModal.classList.add('hidden');
+                paymentForm.reset();
+                updateUI();
+                
+                // Show success animation
+                const button = e.target.querySelector('button[type="submit"]');
+                button.innerHTML = '<i class="fas fa-check mr-2"></i> Salvo!';
+                button.classList.add('bg-success-500', 'hover:bg-success-600');
+                
+                setTimeout(() => {
+                    button.innerHTML = 'Salvar Pagamento';
+                    button.classList.remove('bg-success-500', 'hover:bg-success-600');
+                    button.classList.add('bg-primary-500', 'hover:bg-primary-600');
+                }, 1500);
+            }
+        }
+        
+        function handleEditClient(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-client-id').value;
+            const name = document.getElementById('edit-client-name').value.trim();
+            
+            if (id && name) {
+                const clientIndex = clients.findIndex(c => c.id === id);
+                if (clientIndex !== -1) {
+                    // Update client name
+                    clients[clientIndex].name = name;
+                    
+                    // Update all payments with this client
+                    payments.forEach(payment => {
+                        if (payment.clientId === id) {
+                            payment.clientName = name;
+                        }
+                    });
+                    
+                    saveData();
+                    editClientModal.classList.add('hidden');
+                    updateUI();
+                    
+                    // Show success animation
+                    const button = e.target.querySelector('button[type="submit"]');
+                    button.innerHTML = '<i class="fas fa-check mr-2"></i> Atualizado!';
+                    button.classList.add('bg-success-500', 'hover:bg-success-600');
+                    
+                    setTimeout(() => {
+                        button.innerHTML = 'Atualizar Cliente';
+                        button.classList.remove('bg-success-500', 'hover:bg-success-600');
+                        button.classList.add('bg-primary-500', 'hover:bg-primary-600');
+                    }, 1500);
+                }
+            }
+        }
+        
+        function handleEditPayment(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-payment-id').value;
+            const clientId = document.getElementById('edit-client-select').value;
+            const amount = parseFloat(document.getElementById('edit-payment-amount').value);
+            const date = document.getElementById('edit-payment-date').value;
+            
+            if (id && clientId && amount && date) {
+                const paymentIndex = payments.findIndex(p => p.id === id);
+                if (paymentIndex !== -1) {
+                    const client = clients.find(c => c.id === clientId);
+                    
+                    payments[paymentIndex] = {
+                        ...payments[paymentIndex],
+                        clientId: clientId,
+                        clientName: client.name,
+                        amount: amount,
+                        dueDate: date
+                    };
+                    
+                    saveData();
+                    editPaymentModal.classList.add('hidden');
+                    updateUI();
+                    
+                    // Show success animation
+                    const button = e.target.querySelector('button[type="submit"]');
+                    button.innerHTML = '<i class="fas fa-check mr-2"></i> Atualizado!';
+                    button.classList.add('bg-success-500', 'hover:bg-success-600');
+                    
+                    setTimeout(() => {
+                        button.innerHTML = 'Atualizar Pagamento';
+                        button.classList.remove('bg-success-500', 'hover:bg-success-600');
+                        button.classList.add('bg-primary-500', 'hover:bg-primary-600');
+                    }, 1500);
+                }
+            }
+        }
+        
+        function populateClientSelect() {
+            const select = document.getElementById('client-select');
+            select.innerHTML = '';
+            
+            if (clients.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Nenhum cliente cadastrado';
+                select.appendChild(option);
+                return;
+            }
+            
+            clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.id;
+                option.textContent = client.name;
+                select.appendChild(option);
+            });
+        }
+        
+        function populateEditClientSelect() {
+            const select = document.getElementById('edit-client-select');
+            select.innerHTML = '';
+            
+            clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.id;
+                option.textContent = client.name;
+                select.appendChild(option);
+            });
+        }
+        
+        function openEditClientModal(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            if (client) {
+                document.getElementById('edit-client-id').value = client.id;
+                document.getElementById('edit-client-name').value = client.name;
+                editClientModal.classList.remove('hidden');
+                document.getElementById('edit-client-name').focus();
+            }
+        }
+        
+        function openEditPaymentModal(paymentId) {
+            const payment = payments.find(p => p.id === paymentId);
+            if (payment) {
+                populateEditClientSelect();
+                
+                document.getElementById('edit-payment-id').value = payment.id;
+                document.getElementById('edit-client-select').value = payment.clientId;
+                document.getElementById('edit-payment-amount').value = payment.amount;
+                document.getElementById('edit-payment-date').value = payment.dueDate;
+                
+                editPaymentModal.classList.remove('hidden');
+                document.getElementById('edit-payment-amount').focus();
+            }
+        }
+        
+        function confirmDelete(action, id, message) {
+            document.getElementById('confirm-title').innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i> Confirmar Exclusão`;
+            document.getElementById('confirm-message').textContent = message || 'Tem certeza que deseja excluir este item?';
+            document.getElementById('confirm-action').onclick = () => {
+                if (action === 'deleteClient') {
+                    deleteClient(id);
+                } else if (action === 'deletePayment') {
+                    deletePayment(id);
+                }
+                confirmModal.classList.add('hidden');
+            };
+            confirmModal.classList.remove('hidden');
+        }
+        
+        function deleteClient(clientId) {
+            // Remove client
+            clients = clients.filter(c => c.id !== clientId);
+            
+            // Remove all payments for this client
+            payments = payments.filter(p => p.clientId !== clientId);
+            
+            saveData();
+            updateUI();
+        }
+        
+        function deletePayment(paymentId) {
+            payments = payments.filter(p => p.id !== paymentId);
+            saveData();
+            updateUI();
+        }
+        
+        function markAsPaid(paymentId) {
+            const paymentIndex = payments.findIndex(p => p.id === paymentId);
+            if (paymentIndex !== -1) {
+                const payment = payments[paymentIndex];
+                
+                // Mark as paid
+                payments[paymentIndex] = {
+                    ...payment,
+                    status: 'paid',
+                    paidDate: new Date().toISOString().split('T')[0]
+                };
+                
+                // Create a new pending payment for next month
+                const dueDate = new Date(payment.dueDate);
+                dueDate.setMonth(dueDate.getMonth() + 1);
+                
+                const newDueDate = dueDate.toISOString().split('T')[0];
+                
+                const newPayment = {
+                    id: Date.now().toString(),
+                    clientId: payment.clientId,
+                    clientName: payment.clientName,
+                    amount: payment.amount,
+                    dueDate: newDueDate,
+                    status: 'pending',
+                    paidDate: null
+                };
+                
+                payments.push(newPayment);
+                saveData();
+                updateUI();
+                
+                // Highlight the new pending payment
+                const newPaymentElement = document.querySelector(`tr[data-payment-id="${newPayment.id}"]`);
+                if (newPaymentElement) {
+                    newPaymentElement.classList.add('highlight');
+                    setTimeout(() => {
+                        newPaymentElement.classList.remove('highlight');
+                    }, 3000);
+                }
+            }
+        }
+        
+        function saveData() {
+            localStorage.setItem('clients', JSON.stringify(clients));
+            localStorage.setItem('payments', JSON.stringify(payments));
+        }
+        
+        function updateUI() {
+            updateClientsList();
+            updatePaymentsLists();
+            updateTotalReceived();
+            updateOverdueCount();
+        }
+        
+        function updateClientsList() {
+            const clientsList = document.getElementById('clients-list');
+            clientsList.innerHTML = '';
+            
+            if (clients.length === 0) {
+                clientsList.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500 rounded-b-xl">
+                            Nenhum cliente cadastrado. Clique em "Novo Cliente" para adicionar.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            clients.forEach(client => {
+                const clientPayments = payments.filter(p => p.clientId === client.id);
+                const pendingPayments = clientPayments.filter(p => p.status === 'pending').length;
+                const paidAmount = clientPayments
+                    .filter(p => p.status === 'paid')
+                    .reduce((sum, p) => sum + p.amount, 0);
+                
+                const row = document.createElement('tr');
+                row.className = 'fade-in table-row';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium text-gray-900">${client.name}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${pendingPayments}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">R$ ${paidAmount.toFixed(2)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="btn btn-primary text-white px-3 py-1 text-sm mr-2 edit-client-btn" data-client-id="${client.id}">
+                            <i class="fas fa-edit mr-1"></i> Editar
+                        </button>
+                        <button class="btn btn-danger text-white px-3 py-1 text-sm delete-client-btn" data-client-id="${client.id}">
+                            <i class="fas fa-trash mr-1"></i> Excluir
+                        </button>
+                    </td>
+                `;
+                clientsList.appendChild(row);
+            });
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.edit-client-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    openEditClientModal(e.target.closest('button').dataset.clientId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-client-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const clientId = e.target.closest('button').dataset.clientId;
+                    const client = clients.find(c => c.id === clientId);
+                    const clientPayments = payments.filter(p => p.clientId === clientId);
+                    
+                    let message = `Tem certeza que deseja excluir o cliente "${client.name}"?`;
+                    if (clientPayments.length > 0) {
+                        message += ` Isso também excluirá ${clientPayments.length} pagamento(s) associado(s).`;
+                    }
+                    
+                    confirmDelete('deleteClient', clientId, message);
+                });
+            });
+        }
+        
+        function updatePaymentsLists() {
+            updatePendingPaymentsList();
+            updateOverduePaymentsList();
+            updatePaidPaymentsList();
+        }
+        
+        function updatePendingPaymentsList() {
+            const pendingList = document.getElementById('pending-list');
+            pendingList.innerHTML = '';
+            
+            // Get pending payments and sort by due date (closest first)
+            const pendingPayments = payments
+                .filter(p => p.status === 'pending')
+                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            
+            if (pendingPayments.length === 0) {
+                pendingList.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500 rounded-b-xl">
+                            Nenhum pagamento pendente. Clique em "Novo Pagamento" para adicionar.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            pendingPayments.forEach(payment => {
+                const dueDate = new Date(payment.dueDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                // Skip if payment is overdue (it will appear in overdue list)
+                if (dueDate < today) return;
+                
+                const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                
+                const row = document.createElement('tr');
+                row.className = 'fade-in table-row';
+                row.dataset.paymentId = payment.id;
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium text-gray-900">${payment.clientName}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">R$ ${payment.amount.toFixed(2)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${formatDate(payment.dueDate)}</div>
+                        <div class="text-xs text-gray-500">${daysUntilDue} dias restantes</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="btn btn-success text-white px-3 py-1 text-sm mr-2 mark-paid-btn" data-payment-id="${payment.id}">
+                            <i class="fas fa-check mr-1"></i> Pago
+                        </button>
+                        <button class="btn btn-primary text-white px-3 py-1 text-sm mr-2 edit-payment-btn" data-payment-id="${payment.id}">
+                            <i class="fas fa-edit mr-1"></i> Editar
+                        </button>
+                        <button class="btn btn-danger text-white px-3 py-1 text-sm delete-payment-btn" data-payment-id="${payment.id}">
+                            <i class="fas fa-trash mr-1"></i> Excluir
+                        </button>
+                    </td>
+                `;
+                pendingList.appendChild(row);
+            });
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.mark-paid-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    markAsPaid(e.target.closest('button').dataset.paymentId);
+                });
+            });
+            
+            document.querySelectorAll('.edit-payment-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    openEditPaymentModal(e.target.closest('button').dataset.paymentId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-payment-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const paymentId = e.target.closest('button').dataset.paymentId;
+                    const payment = payments.find(p => p.id === paymentId);
+                    confirmDelete('deletePayment', paymentId, `Tem certeza que deseja excluir o pagamento de ${payment.clientName} no valor de R$ ${payment.amount.toFixed(2)}?`);
+                });
+            });
+        }
+        
+        function updateOverduePaymentsList() {
+            const overdueList = document.getElementById('overdue-list');
+            overdueList.innerHTML = '';
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Get overdue payments and sort by most overdue first
+            const overduePayments = payments
+                .filter(p => {
+                    if (p.status !== 'pending') return false;
+                    const dueDate = new Date(p.dueDate);
+                    return dueDate < today;
+                })
+                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            
+            if (overduePayments.length === 0) {
+                overdueList.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500 rounded-b-xl">
+                            Nenhum pagamento atrasado.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            overduePayments.forEach(payment => {
+                const dueDate = new Date(payment.dueDate);
+                const daysOverdue = Math.ceil((today - dueDate) / (1000 * 60 * 60 * 24));
+                
+                const row = document.createElement('tr');
+                row.className = 'fade-in table-row';
+                row.dataset.paymentId = payment.id;
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium text-gray-900">${payment.clientName}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">R$ ${payment.amount.toFixed(2)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${formatDate(payment.dueDate)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="status-badge bg-danger-100 text-danger-800">
+                            ${daysOverdue} dias atrasado
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="btn btn-success text-white px-3 py-1 text-sm mr-2 mark-paid-btn" data-payment-id="${payment.id}">
+                            <i class="fas fa-check mr-1"></i> Pago
+                        </button>
+                        <button class="btn btn-primary text-white px-3 py-1 text-sm mr-2 edit-payment-btn" data-payment-id="${payment.id}">
+                            <i class="fas fa-edit mr-1"></i> Editar
+                        </button>
+                        <button class="btn btn-danger text-white px-3 py-1 text-sm delete-payment-btn" data-payment-id="${payment.id}">
+                            <i class="fas fa-trash mr-1"></i> Excluir
+                        </button>
+                    </td>
+                `;
+                overdueList.appendChild(row);
+            });
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.mark-paid-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    markAsPaid(e.target.closest('button').dataset.paymentId);
+                });
+            });
+            
+            document.querySelectorAll('.edit-payment-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    openEditPaymentModal(e.target.closest('button').dataset.paymentId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-payment-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const paymentId = e.target.closest('button').dataset.paymentId;
+                    const payment = payments.find(p => p.id === paymentId);
+                    confirmDelete('deletePayment', paymentId, `Tem certeza que deseja excluir o pagamento de ${payment.clientName} no valor de R$ ${payment.amount.toFixed(2)}?`);
+                });
+            });
+        }
+        
+        function updatePaidPaymentsList() {
+            const paidList = document.getElementById('paid-list');
+            paidList.innerHTML = '';
+            
+            // Get paid payments and sort by most recent first
+            const paidPayments = payments
+                .filter(p => p.status === 'paid')
+                .sort((a, b) => new Date(b.paidDate) - new Date(a.paidDate));
+            
+            if (paidPayments.length === 0) {
+                paidList.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500 rounded-b-xl">
+                            Nenhum pagamento recebido ainda.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            paidPayments.forEach(payment => {
+                const row = document.createElement('tr');
+                row.className = 'fade-in table-row';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium text-gray-900">${payment.clientName}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">R$ ${payment.amount.toFixed(2)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${formatDate(payment.paidDate)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="status-badge bg-success-100 text-success-800">
+                            <i class="fas fa-check-circle mr-1"></i> Pago
+                        </span>
+                    </td>
+                `;
+                paidList.appendChild(row);
+            });
+        }
+        
+        function updateTotalReceived() {
+            const total = payments
+                .filter(p => p.status === 'paid')
+                .reduce((sum, p) => sum + p.amount, 0);
+            
+            document.getElementById('total-received').textContent = `R$ ${total.toFixed(2)}`;
+            document.getElementById('total-received-2').textContent = `R$ ${total.toFixed(2)}`;
+        }
+        
+        function updateOverdueCount() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const count = payments.filter(p => {
+                if (p.status !== 'pending') return false;
+                const dueDate = new Date(p.dueDate);
+                return dueDate < today;
+            }).length;
+            
+            document.getElementById('overdue-count').textContent = count;
+            document.getElementById('overdue-count-2').textContent = count;
+        }
+        
+        function formatDate(dateString) {
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            return new Date(dateString).toLocaleDateString('pt-BR', options);
+        }
+    </script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const totalClientsEl = document.getElementById("total-clients");
+    if (totalClientsEl) {
+        const clients = JSON.parse(localStorage.getItem("clients")) || [];
+        totalClientsEl.textContent = clients.length.toString();
+    }
+});
+</script></body>
+</html>
