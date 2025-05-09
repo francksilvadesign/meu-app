@@ -1,6 +1,4 @@
-
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
@@ -546,10 +544,50 @@
 </div>
 </div>
 </div>
+<!-- Config Modal -->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="config-modal">
+<div class="modal-content bg-white w-full max-w-md slide-in">
+<div class="p-6">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xl font-semibold text-gray-800 flex items-center">
+<i class="fas fa-cog mr-2 text-primary-500"></i> Configurações
+                    </h3>
+<button class="text-gray-500 hover:text-gray-700 rounded-full p-1 hover:bg-gray-100" id="close-config-modal">
+<i class="fas fa-times"></i>
+</button>
+</div>
+<form class="space-y-4" id="config-form">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1" for="gist-id">ID do Gist (opcional)</label>
+<input class="input-field w-full px-4 py-2.5" id="gist-id" type="text" placeholder="Deixe vazio para criar um novo Gist"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1" for="github-token">Token de Acesso do GitHub</label>
+<input class="input-field w-full px-4 py-2.5" id="github-token" type="password" required="" placeholder="Seu token de acesso pessoal"/>
+</div>
+<div class="flex justify-end space-x-3 pt-4">
+<button class="btn border border-gray-300 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-50" id="cancel-config" type="button">
+                            Cancelar
+                        </button>
+<button class="btn btn-primary text-white px-4 py-2 rounded-xl" type="submit">
+                            Salvar Configurações
+                        </button>
+</div>
+</form>
+</div>
+</div>
+</div>
 <script>
         // Data storage
         let clients = JSON.parse(localStorage.getItem('clients')) || [];
         let payments = JSON.parse(localStorage.getItem('payments')) || [];
+        
+        // GitHub Gist configuration
+        let gistConfig = {
+            id: localStorage.getItem('gistId') || '',
+            token: localStorage.getItem('githubToken') || '',
+            filename: 'gestor_financeiro_data.json'
+        };
         
         // DOM Elements
         const tabButtons = document.querySelectorAll('.tab-button');
@@ -561,24 +599,45 @@
         const editClientModal = document.getElementById('edit-client-modal');
         const editPaymentModal = document.getElementById('edit-payment-modal');
         const confirmModal = document.getElementById('confirm-modal');
+        const configModal = document.getElementById('config-modal');
         
         // Form elements
         const clientForm = document.getElementById('client-form');
         const paymentForm = document.getElementById('payment-form');
         const editClientForm = document.getElementById('edit-client-form');
         const editPaymentForm = document.getElementById('edit-payment-form');
+        const configForm = document.getElementById('config-form');
         
         // Buttons
         const addClientBtn = document.getElementById('add-client-btn');
         const addPaymentBtn = document.getElementById('add-payment-btn');
         
         // Initialize the app
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check if we have a token, if not show config modal
+            if (!gistConfig.token) {
+                configModal.classList.remove('hidden');
+            } else {
+                await loadFromGist();
+            }
+            
             updateUI();
             setupEventListeners();
             
             // Set default date to today
             document.getElementById('payment-date').valueAsDate = new Date();
+            
+            // Add config button to header
+            const header = document.querySelector('header div:first-child');
+            const configBtn = document.createElement('button');
+            configBtn.className = 'btn border border-gray-300 text-gray-700 px-3 py-1 text-sm mt-2';
+            configBtn.innerHTML = '<i class="fas fa-cog mr-1"></i> Configurações';
+            configBtn.addEventListener('click', () => {
+                document.getElementById('gist-id').value = gistConfig.id;
+                document.getElementById('github-token').value = gistConfig.token;
+                configModal.classList.remove('hidden');
+            });
+            header.appendChild(configBtn);
         });
         
         function setupEventListeners() {
@@ -612,6 +671,7 @@
             document.getElementById('close-edit-client-modal').addEventListener('click', () => editClientModal.classList.add('hidden'));
             document.getElementById('close-edit-payment-modal').addEventListener('click', () => editPaymentModal.classList.add('hidden'));
             document.getElementById('close-confirm-modal').addEventListener('click', () => confirmModal.classList.add('hidden'));
+            document.getElementById('close-config-modal').addEventListener('click', () => configModal.classList.add('hidden'));
             
             // Cancel buttons
             document.getElementById('cancel-client').addEventListener('click', () => clientModal.classList.add('hidden'));
@@ -619,13 +679,147 @@
             document.getElementById('cancel-edit-client').addEventListener('click', () => editClientModal.classList.add('hidden'));
             document.getElementById('cancel-edit-payment').addEventListener('click', () => editPaymentModal.classList.add('hidden'));
             document.getElementById('cancel-confirm').addEventListener('click', () => confirmModal.classList.add('hidden'));
+            document.getElementById('cancel-config').addEventListener('click', () => configModal.classList.add('hidden'));
             
             // Form submissions
             clientForm.addEventListener('submit', handleAddClient);
             paymentForm.addEventListener('submit', handleAddPayment);
             editClientForm.addEventListener('submit', handleEditClient);
             editPaymentForm.addEventListener('submit', handleEditPayment);
+            configForm.addEventListener('submit', handleConfigSave);
         }
+        
+        function handleConfigSave(e) {
+            e.preventDefault();
+            gistConfig.id = document.getElementById('gist-id').value.trim();
+            gistConfig.token = document.getElementById('github-token').value.trim();
+            
+            if (gistConfig.token) {
+                localStorage.setItem('gistId', gistConfig.id);
+                localStorage.setItem('githubToken', gistConfig.token);
+                
+                loadFromGist().then(() => {
+                    configModal.classList.add('hidden');
+                });
+                
+                // Show success animation
+                const button = e.target.querySelector('button[type="submit"]');
+                button.innerHTML = '<i class="fas fa-check mr-2"></i> Configurações salvas!';
+                button.classList.add('bg-success-500', 'hover:bg-success-600');
+                
+                setTimeout(() => {
+                    button.innerHTML = 'Salvar Configurações';
+                    button.classList.remove('bg-success-500', 'hover:bg-success-600');
+                    button.classList.add('bg-primary-500', 'hover:bg-primary-600');
+                }, 1500);
+            }
+        }
+        
+        // Função para salvar dados no Gist
+        async function saveToGist() {
+            if (!gistConfig.token) return;
+            
+            try {
+                const data = {
+                    clients: clients,
+                    payments: payments,
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                const method = gistConfig.id ? 'PATCH' : 'POST';
+                const url = gistConfig.id ? 
+                    `https://api.github.com/gists/${gistConfig.id}` :
+                    'https://api.github.com/gists';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `token ${gistConfig.token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify({
+                        description: 'Dados do Gestor Financeiro',
+                        files: {
+                            [gistConfig.filename]: {
+                                content: JSON.stringify(data, null, 2)
+                            }
+                        },
+                        public: false // Gist privado
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Falha ao salvar no Gist');
+                }
+                
+                const responseData = await response.json();
+                if (!gistConfig.id) {
+                    gistConfig.id = responseData.id; // Armazena o ID do novo Gist
+                    localStorage.setItem('gistId', gistConfig.id);
+                }
+                
+                console.log('Dados salvos no Gist com sucesso!');
+            } catch (error) {
+                console.error('Erro ao salvar no Gist:', error);
+            }
+        }
+        
+        // Função para carregar dados do Gist
+        async function loadFromGist() {
+            if (!gistConfig.token || !gistConfig.id) return;
+            
+            try {
+                const response = await fetch(
+                    `https://api.github.com/gists/${gistConfig.id}`,
+                    {
+                        headers: {
+                            'Authorization': `token ${gistConfig.token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    }
+                );
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const content = data.files[gistConfig.filename].content;
+                    const parsed = JSON.parse(content);
+                    
+                    clients = parsed.clients || [];
+                    payments = parsed.payments || [];
+                    
+                    // Salva também no localStorage para uso offline
+                    saveDataToLocal();
+                    
+                    console.log('Dados carregados do Gist com sucesso!');
+                    updateUI();
+                } else {
+                    throw new Error('Falha ao carregar do Gist');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar do Gist:', error);
+                // Se falhar, usa os dados do localStorage
+                clients = JSON.parse(localStorage.getItem('clients')) || [];
+                payments = JSON.parse(localStorage.getItem('payments')) || [];
+            }
+        }
+        
+        // Função para salvar dados localmente e no Gist
+        function saveData() {
+            saveDataToLocal();
+            saveToGist().catch(error => {
+                console.error('Falha ao sincronizar com Gist:', error);
+            });
+        }
+        
+        // Função para salvar apenas localmente
+        function saveDataToLocal() {
+            localStorage.setItem('clients', JSON.stringify(clients));
+            localStorage.setItem('payments', JSON.stringify(payments));
+        }
+        
+        // Restante das funções permanecem as mesmas (handleAddClient, handleAddPayment, etc.)
+        // ... (todas as outras funções do código original permanecem iguais)
         
         function handleAddClient(e) {
             e.preventDefault();
@@ -899,16 +1093,16 @@
             }
         }
         
-        function saveData() {
-            localStorage.setItem('clients', JSON.stringify(clients));
-            localStorage.setItem('payments', JSON.stringify(payments));
-        }
-        
         function updateUI() {
             updateClientsList();
             updatePaymentsLists();
             updateTotalReceived();
             updateOverdueCount();
+            updateTotalClients();
+        }
+        
+        function updateTotalClients() {
+            document.getElementById('total-clients').textContent = clients.length;
         }
         
         function updateClientsList() {
@@ -1232,13 +1426,5 @@
             return new Date(dateString).toLocaleDateString('pt-BR', options);
         }
     </script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const totalClientsEl = document.getElementById("total-clients");
-    if (totalClientsEl) {
-        const clients = JSON.parse(localStorage.getItem("clients")) || [];
-        totalClientsEl.textContent = clients.length.toString();
-    }
-});
-</script></body>
+</body>
 </html>
